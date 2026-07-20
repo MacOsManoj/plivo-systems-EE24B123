@@ -4,7 +4,7 @@ This repository contains my final C++17 solution for the Plivo Systems Track Ass
 
 The implementation achieves zero-buffer immediate playout with minimal playout delay by pairing **Stride-1 XOR Forward Error Correction (FEC)** with an **Adaptive Jitter Buffer-inspired NACK retransmission engine**.
 
-## 🚀 Core Architecture
+## Core Architecture
 
 ### 1. Low-Overhead Wire Format (`sender.cpp`)
 Packet types are encoded inside the existing sequence number by taking advantage of the Most Significant Bit (MSB):
@@ -25,7 +25,7 @@ A stride-1 XOR parity block is generated continuously. For every frame $i$, it c
     *   **Wait Delay (`nack_wait`):** The thread waits dynamically (`avg_transit + 15ms margin`) after a frame's theoretical production time before issuing a NACK. This ensures that delayed packets aren't prematurely flagged as missing, drastically reducing unnecessary feedback bandwidth while catching true drops faster.
     *   **Deadline Cutoff:** NACKs cease $20\%$ of `DELAY_MS` before the frame's true deadline, preserving bandwidth when retransmissions would logically arrive too late.
 
-## 📊 Stress Test & Minimum Threshold Analysis
+## Stress Test & Minimum Threshold Analysis
 A parameter sweep was conducted by gradually decreasing `delay_ms` on Profile A to determine the absolute minimum playout delay required for **zero missing frames**.
 
 | Playout Delay (`delay_ms`) | Deadline Misses | Miss Rate (%) | Status |
@@ -38,7 +38,7 @@ A parameter sweep was conducted by gradually decreasing `delay_ms` on Profile A 
 
 The system achieves 100% loss-free recovery at **65 ms**, and safely passes the `< 1.00%` miss cap down to **45 ms**.
 
-## 🛠 Building & Running
+## Building & Running
 ```bash
 # Build sender and receiver
 make clean && make
