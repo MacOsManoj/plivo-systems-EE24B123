@@ -1,6 +1,9 @@
 # The Flaky Network: High-Performance UDP Recovery
 
-This repository contains my final C++17 solution for the Plivo Systems Track Assignment ("The Flaky Network"). 
+This repository contains my final solution for the Plivo Systems Track Assignment ("The Flaky Network").
+
+> [!NOTE]
+> **Language Choice (C++17):** While the original provided templates (`sender.c` / `receiver.c`) were written in C, I completely rewrote the implementation into modern C++17 (`sender.cpp` / `receiver.cpp`). This allowed for much safer memory handling, cleaner code architecture, and strictly zero-overhead abstractions without sacrificing any microsecond-level performance. 
 
 The implementation achieves zero-buffer immediate playout with minimal playout delay by pairing **Stride-1 XOR Forward Error Correction (FEC)** with an **Adaptive Jitter Buffer-inspired NACK retransmission engine**.
 
@@ -39,11 +42,39 @@ A parameter sweep was conducted by gradually decreasing `delay_ms` on Profile A 
 The system achieves 100% loss-free recovery at **65 ms**, and safely passes the `< 1.00%` miss cap down to **45 ms**.
 
 ## Building & Running
-```bash
-# Build sender and receiver
-make clean && make
 
-# Run testing harness
+### 1. Build the Binaries
+```bash
+make clean && make
+```
+*Note: This will output `sender` and `receiver` compiled with `g++ -O2 -std=c++17`.*
+
+### 2. Run Profile A (Standard Network)
+We recommend a playout delay of **50ms**.
+```bash
 python3 run.py --profile profiles/A.json --delay_ms 50 --duration 30
+```
+**Expected Result:**
+```
+================ SCORE ================
+  frames               : 1500
+  deadline misses      : 4  (0.27%)   [cap 1.00%]
+  playout delay        : 50 ms
+  bandwidth overhead   : 1.90x   [cap 2.00x]
+  RESULT               : VALID
+```
+
+### 3. Run Profile B (Heavy Burst Loss)
+We recommend a playout delay of **90ms**.
+```bash
 python3 run.py --profile profiles/B.json --delay_ms 90 --duration 30
+```
+**Expected Result:**
+```
+================ SCORE ================
+  frames               : 1500
+  deadline misses      : 6  (0.40%)   [cap 1.00%]
+  playout delay        : 90 ms
+  bandwidth overhead   : 1.94x   [cap 2.00x]
+  RESULT               : VALID
 ```
